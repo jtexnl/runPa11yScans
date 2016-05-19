@@ -1,7 +1,7 @@
 import collections
 import json
 
-def jsonify(self, dataSet):
+def jsonify(dataSet):
     titleRow = dataSet[0]
     ln = len(titleRow) - 1
     outputList = []
@@ -12,6 +12,6 @@ def jsonify(self, dataSet):
         outputList.append(output)
     return outputList
 
-def writeJson(self, inputData, fileName):
+def writeJson(inputData, fileName):
     with open(fileName, 'w+') as outfile:
         json.dump(inputData, outfile, indent = 4)
