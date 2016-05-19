@@ -39,7 +39,7 @@ class runner():
         masterData = {}
         jobs = []
         for row in domainList:
-            site = row.lower()
+            site = row[0].lower()
             try:
                 self.scan(site)
                 temp = self.loadAndClean(site + '.csv')
