@@ -6,11 +6,14 @@ import csv
 import datetime
 import utils
 
+mistakes = []
+
 class runner():
     def __init__(self):
         self.date = datetime.datetime.now().strftime('%Y%m%d')
         self.domains = self.loadDomains('../data/domains.csv')
-        self.output = self.runScans(self.domains, 10)
+        #self.domains = ['gsa.gov', 'dhs.gov', 'cio.gov', 'eop.gov', 'whitehouse.gov', 'aids.gov', 'house.gov', 'senate.gov', 'americorps.gov', 'arctic.gov', 'amtrakoig.gov', 'bea.gov', 'bpa.gov']
+        self.output = self.runScans(self.domains)
     #Loads the domain file and cleans up the output, yielding a clean list
     def loadDomains(self, path):
         with open(path) as infile:
@@ -32,22 +35,27 @@ class runner():
             output.append(row.replace('"', '').replace('\n', '').split(','))
         return output
     #Function to run the scanner on a list of domains. Threading functions need some work. Outputs the data as a dict.
-    def runScans(self, domainList, numThreads):
-        threads = numThreads
+    def runScans(self, domainList):
         masterData = {}
         jobs = []
         for row in domainList:
-            site = row[0].lower()
-            thread = threading.Thread(target = self.scan(site))
-            temp = self.loadAndClean(site + '.csv')
+            site = row.lower()
             try:
-                data = utils.jsonify(temp)
-            except IndexError:
-                data = 'File Error'
-            masterData[site] = data
-            os.system('rm ' + site + '.csv')
+                self.scan(site)
+                temp = self.loadAndClean(site + '.csv')
+                try:
+                    data = utils.jsonify(temp)
+                except IndexError:
+                    data = 'File Error'
+                masterData[site] = data
+                os.system('rm ' + site + '.csv')
+            except:
+                print('error: ' + site)
+                mistakes.append(site)
         return masterData
 
 if __name__ == '__main__':
     test = runner()
-    utils.writeJson(test.output, 'testRun.json')
+    utils.writeJson(test.output, 'scanResults.json')
+    for row in mistakes:
+        print(row)
